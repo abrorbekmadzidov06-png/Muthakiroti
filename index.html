@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Kun tartibim</title>
+<title>Muthakkiroti</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0d2118">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Kun tartibim">
+<meta name="apple-mobile-web-app-title" content="Muthakkiroti">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,7 +27,28 @@
     --text-muted: #9fc2ac;
     --text-faint: #5f8a71;
     --danger: #e08a7d;
+    --transition-theme: background-color .25s ease, color .25s ease, border-color .25s ease;
   }
+  html[data-theme="light"]{
+    --bg: #f5f8f1;
+    --bg-panel: #ffffff;
+    --bg-panel-2: #eef3e9;
+    --line: #d8e2d1;
+    --gold: #b9791a;
+    --mint: #2f9e6f;
+    --mint-dim: #e1f5ea;
+    --text: #16281c;
+    --text-muted: #48604f;
+    --text-faint: #7c9484;
+    --danger: #c2564a;
+  }
+  html[data-theme="light"] body{
+    background: radial-gradient(ellipse 900px 500px at 15% -10%, #e4efdd 0%, transparent 60%), var(--bg);
+  }
+  html[data-theme="light"] .reminder{ background: rgba(47,158,111,0.10); color: #17301f; }
+  html[data-theme="light"] .btn-pill.on{ color: #0e3a24; }
+  html[data-theme="light"] .add-btn{ color: #0e3a24; }
+  body, .panel, .hero, .task-row, .upcoming-item, .timeline{ transition: var(--transition-theme); }
   *{ box-sizing: border-box; }
   html,body{ margin:0; padding:0; }
   body{
@@ -168,6 +189,31 @@
   .upcoming-item .l{ color: var(--text); }
   .empty-hint{ color: var(--text-faint); font-size:0.85rem; margin-top:0.4rem; }
   footer.note{ margin-top: 2.2rem; color: var(--text-faint); font-size: 0.78rem; line-height:1.6; border-top: 1px solid var(--line); padding-top: 1.2rem; }
+
+  /* Settings modal */
+  .modal-backdrop{
+    display:none; position:fixed; inset:0; background: rgba(3,10,6,0.6);
+    z-index: 50; align-items:center; justify-content:center; padding: 1.2rem;
+    backdrop-filter: blur(2px);
+  }
+  .modal-backdrop.show{ display:flex; }
+  .modal{
+    background: var(--bg-panel); border:1px solid var(--line); border-radius: 20px;
+    padding: 1.8rem; max-width: 420px; width:100%; max-height: 85vh; overflow-y:auto;
+    transition: var(--transition-theme);
+  }
+  .modal-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.4rem; }
+  .modal-head h2{ font-family:'Fraunces', serif; font-weight:600; font-size:1.25rem; margin:0; }
+  .theme-choice{ display:grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; margin-bottom: 0.3rem; }
+  .theme-opt{
+    background: var(--bg-panel-2); border: 2px solid var(--line); border-radius: 14px;
+    padding: 1rem 0.6rem; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:0.4rem;
+    color: var(--text-muted); font-family:'Inter',sans-serif; font-size:0.85rem; font-weight:600;
+    transition: border-color .15s, color .15s;
+  }
+  .theme-opt-icon{ font-size:1.6rem; }
+  .theme-opt.active{ border-color: var(--gold); color: var(--text); }
+  .about-text{ color: var(--text-muted); font-size: 0.85rem; line-height:1.6; margin: 0 0 0.4rem; }
 </style>
 </head>
 <body>
@@ -176,10 +222,18 @@
   <header class="top">
     <div>
       <p class="brand-eyebrow">Bomdoddan boshlanadi</p>
-      <h1>Kun tartibim</h1>
+      <h1>Muthakkiroti</h1>
       <p class="today-date" id="todayDate"></p>
     </div>
     <div class="header-actions">
+      <button class="btn-pill" id="themeBtn" type="button" title="Tungi/Tongi rejim">
+        <span id="themeIcon">🌙</span>
+        <span id="themeBtnText">Tungi rejim</span>
+      </button>
+      <button class="btn-pill" id="settingsBtn" type="button" title="Sozlamalar">
+        <span>⚙️</span>
+        <span>Sozlamalar</span>
+      </button>
       <button class="btn-pill" id="installBtn" type="button" style="display:none;">
         <span class="dot" style="background:var(--gold);box-shadow:0 0 8px var(--gold);"></span>
         <span>Ilovani o'rnatish</span>
@@ -193,6 +247,35 @@
 
   <div class="ios-hint" id="iosHint">📲 iPhone'da o'rnatish uchun: pastdagi <b>Ulashish</b> tugmasini bosing → <b>"Bosh ekranga qo'shish"</b>ni tanlang.</div>
   <div class="notif-msg" id="notifMsg"></div>
+
+  <div class="modal-backdrop" id="settingsBackdrop">
+    <div class="modal" id="settingsModal">
+      <div class="modal-head">
+        <h2>Sozlamalar</h2>
+        <button class="icon-btn" id="closeSettings" title="Yopish">✕</button>
+      </div>
+
+      <p class="section-label">Ko'rinish rejimi</p>
+      <div class="theme-choice">
+        <button class="theme-opt" id="themeOptDark" type="button">
+          <span class="theme-opt-icon">🌙</span>
+          <span>Tungi rejim</span>
+        </button>
+        <button class="theme-opt" id="themeOptLight" type="button">
+          <span class="theme-opt-icon">☀️</span>
+          <span>Tongi rejim</span>
+        </button>
+      </div>
+
+      <p class="section-label">Vazifalar</p>
+      <button class="btn-pill" id="resetTasksBtn" type="button" style="width:100%; justify-content:center;">
+        ↺ Vazifalarni standart holatga qaytarish
+      </button>
+
+      <p class="section-label">Ilova haqida</p>
+      <p class="about-text">Muthakkiroti — bomdoddan boshlab kuningizni tartibga soluvchi va har bosqichda eslatib turadigan shaxsiy hamroh.</p>
+    </div>
+  </div>
 
   <section class="panel" id="setupPanel">
     <h2>Bugungi jadvalni tuzing</h2>
@@ -342,6 +425,58 @@
     labelInput.focus();
   });
   renderTaskList();
+
+  // ---------- Theme (tungi / tongi rejim) ----------
+  const themeBtn = $("themeBtn");
+  const themeIcon = $("themeIcon");
+  const themeBtnText = $("themeBtnText");
+  function applyTheme(mode){
+    document.documentElement.setAttribute("data-theme", mode);
+    if (mode === "light") {
+      themeIcon.textContent = "☀️";
+      themeBtnText.textContent = "Tongi rejim";
+    } else {
+      themeIcon.textContent = "🌙";
+      themeBtnText.textContent = "Tungi rejim";
+    }
+    $("themeOptDark").classList.toggle("active", mode === "dark");
+    $("themeOptLight").classList.toggle("active", mode === "light");
+    try { localStorage.setItem("muthakkiroti_theme", mode); } catch(e){}
+  }
+  themeBtn.addEventListener("click", () => {
+    const current = document.documentElement.getAttribute("data-theme") || "dark";
+    applyTheme(current === "dark" ? "light" : "dark");
+  });
+  $("themeOptDark").addEventListener("click", () => applyTheme("dark"));
+  $("themeOptLight").addEventListener("click", () => applyTheme("light"));
+  let savedTheme = "dark";
+  try { savedTheme = localStorage.getItem("muthakkiroti_theme") || "dark"; } catch(e){}
+  applyTheme(savedTheme);
+
+  // ---------- Settings modal ----------
+  const settingsBackdrop = $("settingsBackdrop");
+  $("settingsBtn").addEventListener("click", () => settingsBackdrop.classList.add("show"));
+  $("closeSettings").addEventListener("click", () => settingsBackdrop.classList.remove("show"));
+  settingsBackdrop.addEventListener("click", (e) => {
+    if (e.target === settingsBackdrop) settingsBackdrop.classList.remove("show");
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") settingsBackdrop.classList.remove("show");
+  });
+
+  $("resetTasksBtn").addEventListener("click", () => {
+    if (!confirm("Vazifalar ro'yxatini standart holatga qaytarishni xohlaysizmi? Qo'shgan/o'zgartirgan vazifalaringiz yo'qoladi.")) return;
+    tasks = [
+      { id: 1, label: "Jismoniy shug'ullanish / trenirovka", duration: 35 },
+      { id: 2, label: "Onlayn dars", duration: 60 },
+      { id: 3, label: "Uy vazifalari", duration: 90 },
+      { id: 4, label: "Kitob o'qish — shaxsiy rivojlanish", duration: 30 },
+      { id: 5, label: "Oilaga qo'ng'iroq", duration: 10 },
+    ];
+    nextTaskId = 6;
+    renderTaskList();
+    settingsBackdrop.classList.remove("show");
+  });
 
   // ---------- Notifications ----------
   let notifOn = false;
