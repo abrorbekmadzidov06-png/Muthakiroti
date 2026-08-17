@@ -13,7 +13,7 @@
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg: #0d2118;
@@ -220,6 +220,7 @@
   .modal-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.4rem; }
   .modal-head h2{ font-family:'Fraunces', serif; font-weight:600; font-size:1.25rem; margin:0; }
   .theme-choice{ display:grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; margin-bottom: 0.3rem; }
+  .lang-choice{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; margin-bottom: 0.3rem; }
   .theme-opt{
     background: var(--bg-panel-2); border: 2px solid var(--line); border-radius: 14px;
     padding: 1rem 0.6rem; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:0.4rem;
@@ -274,6 +275,12 @@
     .theme-choice{ gap: 0.5rem; }
     .theme-opt{ padding: 0.8rem 0.4rem; font-size: 0.8rem; }
   }
+  html[lang="ar"] body, html[lang="ar"] input, html[lang="ar"] button{ font-family: 'Tajawal', 'Inter', sans-serif; }
+  html[lang="ar"] h1, html[lang="ar"] .panel h2, html[lang="ar"] .hero h2, html[lang="ar"] .modal-head h2{ font-family: 'Tajawal', sans-serif; font-weight:700; }
+  html[dir="rtl"] .reminder{ border-left: none; border-right: 3px solid var(--mint); border-radius: 10px 0 0 10px; }
+  html[dir="rtl"] .icon-circle .dot{ right: auto; left: 6px; }
+  html[dir="rtl"] .bead-track::before{ left: auto; right: 50%; transform: translateX(50%); }
+  html[dir="rtl"] .warn, html[dir="rtl"] .notif-msg, html[dir="rtl"] .ios-hint{ text-align: right; }
   @media (max-width: 360px){
     .grid-inputs{ grid-template-columns: 1fr; }
   }
@@ -284,7 +291,7 @@
 
   <header class="top">
     <div>
-      <p class="brand-eyebrow">Bomdoddan boshlanadi</p>
+      <p class="brand-eyebrow" data-i18n="eyebrow">Bomdoddan boshlanadi</p>
       <h1>Muthakkiroti</h1>
       <p class="today-date" id="todayDate"></p>
     </div>
@@ -306,134 +313,355 @@
     </div>
   </header>
 
-  <div class="ios-hint" id="iosHint">📲 iPhone'da o'rnatish uchun: pastdagi <b>Ulashish</b> tugmasini bosing → <b>"Bosh ekranga qo'shish"</b>ni tanlang.</div>
+  <div class="ios-hint" id="iosHint"><span id="iosHintText">📲 iPhone'da o'rnatish uchun: pastdagi <b>Ulashish</b> tugmasini bosing → <b>"Bosh ekranga qo'shish"</b>ni tanlang.</span></div>
   <div class="notif-msg" id="notifMsg"></div>
 
   <div class="modal-backdrop" id="settingsBackdrop">
     <div class="modal" id="settingsModal">
       <div class="modal-head">
-        <h2>Sozlamalar</h2>
+        <h2 data-i18n="settingsTitle">Sozlamalar</h2>
         <button class="icon-btn" id="closeSettings" title="Yopish">✕</button>
       </div>
 
-      <p class="section-label">Ko'rinish rejimi</p>
-      <div class="theme-choice">
-        <button class="theme-opt" id="themeOptDark" type="button">
-          <span class="theme-opt-icon">🌙</span>
-          <span>Tungi rejim</span>
+      <p class="section-label" data-i18n="langSectionLabel">Til</p>
+      <div class="lang-choice">
+        <button class="theme-opt" id="langUz" type="button">
+          <span class="theme-opt-icon">🇺🇿</span>
+          <span>O'zbek</span>
         </button>
-        <button class="theme-opt" id="themeOptLight" type="button">
-          <span class="theme-opt-icon">☀️</span>
-          <span>Tongi rejim</span>
+        <button class="theme-opt" id="langEn" type="button">
+          <span class="theme-opt-icon">🇬🇧</span>
+          <span>English</span>
+        </button>
+        <button class="theme-opt" id="langAr" type="button">
+          <span class="theme-opt-icon">🇸🇦</span>
+          <span>العربية</span>
         </button>
       </div>
 
-      <p class="section-label">Vazifalar</p>
+      <p class="section-label" data-i18n="themeSectionLabel">Ko'rinish rejimi</p>
+      <div class="theme-choice">
+        <button class="theme-opt" id="themeOptDark" type="button">
+          <span class="theme-opt-icon">🌙</span>
+          <span data-i18n="themeDark">Tungi rejim</span>
+        </button>
+        <button class="theme-opt" id="themeOptLight" type="button">
+          <span class="theme-opt-icon">☀️</span>
+          <span data-i18n="themeLight">Tongi rejim</span>
+        </button>
+      </div>
+
+      <p class="section-label" data-i18n="tasksSectionLabel">Vazifalar</p>
       <button class="btn-pill" id="resetTasksBtn" type="button" style="width:100%; justify-content:center;">
-        ↺ Vazifalarni standart holatga qaytarish
+        <span data-i18n="resetTasksBtn">↺ Vazifalarni standart holatga qaytarish</span>
       </button>
 
-      <p class="section-label">Ilova haqida</p>
-      <p class="about-text">Muthakkiroti — bomdoddan boshlab kuningizni tartibga soluvchi va har bosqichda eslatib turadigan shaxsiy hamroh.</p>
+      <p class="section-label" data-i18n="aboutSectionLabel">Ilova haqida</p>
+      <p class="about-text" data-i18n="aboutText">Muthakkiroti — bomdoddan boshlab kuningizni tartibga soluvchi va har bosqichda eslatib turadigan shaxsiy hamroh.</p>
     </div>
   </div>
 
   <section class="panel" id="setupPanel">
-    <h2>Bugungi jadvalni tuzing</h2>
-    <p class="sub">Vazifalaringizni erkin qo'shing, o'chiring yoki tartibini o'zgartiring — jadval shularga qarab avtomatik tuziladi.</p>
+    <h2 data-i18n="panelTitle">Bugungi jadvalni tuzing</h2>
+    <p class="sub" data-i18n="panelSub">Vazifalaringizni erkin qo'shing, o'chiring yoki tartibini o'zgartiring — jadval shularga qarab avtomatik tuziladi.</p>
 
     <div class="grid-inputs">
       <div class="field">
-        <label for="bomdod">Bomdod vaqti</label>
+        <label for="bomdod" data-i18n="lblBomdod">Bomdod vaqti</label>
         <input type="time" id="bomdod" value="05:10" />
       </div>
       <div class="field">
-        <label for="peshin">Peshin <span class="opt">(ixtiyoriy)</span></label>
+        <label for="peshin"><span data-i18n="lblPeshin">Peshin</span> <span class="opt" data-i18n="optIxtiyoriy">(ixtiyoriy)</span></label>
         <input type="time" id="peshin" />
       </div>
       <div class="field">
-        <label for="asr">Asr <span class="opt">(ixtiyoriy)</span></label>
+        <label for="asr"><span data-i18n="lblAsr">Asr</span> <span class="opt" data-i18n="optIxtiyoriy">(ixtiyoriy)</span></label>
         <input type="time" id="asr" />
       </div>
       <div class="field">
-        <label for="shom">Shom <span class="opt">(ixtiyoriy)</span></label>
+        <label for="shom"><span data-i18n="lblShom">Shom</span> <span class="opt" data-i18n="optIxtiyoriy">(ixtiyoriy)</span></label>
         <input type="time" id="shom" />
       </div>
       <div class="field">
-        <label for="xufton">Xufton <span class="opt">(ixtiyoriy)</span></label>
+        <label for="xufton"><span data-i18n="lblXufton">Xufton</span> <span class="opt" data-i18n="optIxtiyoriy">(ixtiyoriy)</span></label>
         <input type="time" id="xufton" />
       </div>
     </div>
 
-    <p class="section-label">Bomdoddan keyingi vazifalar (tartib bo'yicha)</p>
+    <p class="section-label" data-i18n="sectionTasks">Bomdoddan keyingi vazifalar (tartib bo'yicha)</p>
     <div id="taskListWrap"></div>
     <div class="add-task-row">
       <input type="text" id="newTaskLabel" placeholder="Yangi vazifa nomi, masalan: Sport zali" />
       <input type="number" id="newTaskDur" placeholder="daq" min="5" step="5" value="30" />
-      <button class="add-btn" id="addTaskBtn" type="button">+ Qo'shish</button>
+      <button class="add-btn" id="addTaskBtn" type="button" data-i18n="addTaskBtn">+ Qo'shish</button>
     </div>
 
-    <p class="section-label">Ish vaqti</p>
+    <p class="section-label" data-i18n="sectionIsh">Ish vaqti</p>
     <div class="grid-inputs">
       <div class="field">
-        <label for="ishStart">Boshlanishi</label>
+        <label for="ishStart" data-i18n="lblIshStart">Boshlanishi</label>
         <input type="time" id="ishStart" value="09:00" />
       </div>
       <div class="field">
-        <label for="ishEnd">Tugashi</label>
+        <label for="ishEnd" data-i18n="lblIshEnd">Tugashi</label>
         <input type="time" id="ishEnd" value="18:00" />
       </div>
       <div class="field" style="grid-column: span 2;">
-        <label for="ishLabel">Ish tavsifi</label>
+        <label for="ishLabel" data-i18n="lblIshLabel">Ish tavsifi</label>
         <input type="text" id="ishLabel" value="Ish — syomka/montaj + rahbar topshiriqlari" />
       </div>
     </div>
 
-    <button class="generate-btn" id="generateBtn" type="button">Jadvalni tuzish / yangilash</button>
+    <button class="generate-btn" id="generateBtn" type="button" data-i18n="generateBtn">Jadvalni tuzish / yangilash</button>
     <div class="warn" id="warnBox"></div>
   </section>
 
   <div class="stage" id="stage">
     <aside class="timeline" id="timeline">
-      <h3>Bugungi ip</h3>
+      <h3 data-i18n="timelineTitle">Bugungi ip</h3>
       <div id="beadList"></div>
     </aside>
     <div class="main-col">
       <div class="hero" id="heroCard"></div>
-      <p class="upcoming-title">Keyingi bosqichlar</p>
+      <p class="upcoming-title" data-i18n="upcomingTitle">Keyingi bosqichlar</p>
       <div class="upcoming-list" id="upcomingList"></div>
     </div>
   </div>
 
   <footer class="note">
-    Eslatma: bildirishnomalar faqat shu sahifa brauzerda ochiq turgan vaqtda, va faqat xavfsiz (https yoki localhost) manzilda ishlaydi. Faylni to'g'ridan-to'g'ri ochsangiz (file://), brauzer bildirishnoma so'rovini avtomatik bloklaydi — bu ilovaning xatosi emas, brauzerning xavfsizlik qoidasi. Hosting qilingandan keyin (masalan GitHub Pages) to'liq ishlaydi.
+    <span id="footerNoteText">Eslatma: bildirishnomalar faqat shu sahifa brauzerda ochiq turgan vaqtda, va faqat xavfsiz (https yoki localhost) manzilda ishlaydi. Faylni to'g'ridan-to'g'ri ochsangiz (file://), brauzer bildirishnoma so'rovini avtomatik bloklaydi — bu ilovaning xatosi emas, brauzerning xavfsizlik qoidasi. Hosting qilingandan keyin (masalan GitHub Pages) to'liq ishlaydi.</span>
   </footer>
 </div>
 
 <script>
 (function(){
-  const REMINDERS = [
-    "Payg'ambarimiz (s.a.v.) sog'liq va bo'sh vaqtni ko'p odamlar g'aflatda qoladigan ikki ne'mat, deb aytganlar (Buxoriy rivoyati). Shu daqiqani g'animat bil.",
-    "Besh narsani besh narsadan oldin qadrla, deyilgan hadisda — jumladan bandlikdan oldin bo'sh vaqtni. Hozir shu bo'sh vaqting, undan foydalan.",
-    "Kichik amal ham ixlos bilan qilinsa, katta ajr keltiradi. Niyatingni tuzatib, boshla.",
-    "Vaqt — qaytmas boylik. Har daqiqa foydali ishga sarflansa, umr baraka topadi.",
-    "Bugungi mehnating ertangi yengillashuving uchun sabab bo'ladi. Bismillah, boshla.",
-    "G'aflatdan uyg'on — bu payt ham, avvalgi paytlar kabi, qaytmaydi. Qo'lga ol.",
-  ];
-  function randomReminder(){ return REMINDERS[Math.floor(Math.random()*REMINDERS.length)]; }
+  const TRANSLATIONS = {
+    uz: {
+      dir: "ltr", locale: "uz-UZ",
+      eyebrow: "Bomdoddan boshlanadi",
+      settingsTitle: "Sozlamalar",
+      langSectionLabel: "Til",
+      themeSectionLabel: "Ko'rinish rejimi",
+      themeDark: "Tungi rejim",
+      themeLight: "Tongi rejim",
+      tasksSectionLabel: "Vazifalar",
+      resetTasksBtn: "↺ Vazifalarni standart holatga qaytarish",
+      aboutSectionLabel: "Ilova haqida",
+      aboutText: "Muthakkiroti — bomdoddan boshlab kuningizni tartibga soluvchi va har bosqichda eslatib turadigan shaxsiy hamroh.",
+      panelTitle: "Bugungi jadvalni tuzing",
+      panelSub: "Vazifalaringizni erkin qo'shing, o'chiring yoki tartibini o'zgartiring — jadval shularga qarab avtomatik tuziladi.",
+      lblBomdod: "Bomdod vaqti",
+      lblPeshin: "Peshin", lblAsr: "Asr", lblShom: "Shom", lblXufton: "Xufton",
+      optIxtiyoriy: "(ixtiyoriy)",
+      sectionTasks: "Bomdoddan keyingi vazifalar (tartib bo'yicha)",
+      newTaskPh: "Yangi vazifa nomi, masalan: Sport zali",
+      durPh: "daq",
+      addTaskBtn: "+ Qo'shish",
+      sectionIsh: "Ish vaqti",
+      lblIshStart: "Boshlanishi", lblIshEnd: "Tugashi", lblIshLabel: "Ish tavsifi",
+      generateBtn: "Jadvalni tuzish / yangilash",
+      timelineTitle: "Bugungi ip",
+      upcomingTitle: "Keyingi bosqichlar",
+      footerNote: "Eslatma: bildirishnomalar faqat shu sahifa brauzerda ochiq turgan vaqtda, va faqat xavfsiz (https yoki localhost) manzilda ishlaydi. Faylni to'g'ridan-to'g'ri ochsangiz (file://), brauzer bildirishnoma so'rovini avtomatik bloklaydi — bu ilovaning xatosi emas, brauzerning xavfsizlik qoidasi. Hosting qilingandan keyin (masalan GitHub Pages) to'liq ishlaydi.",
+      iosHint: '📲 iPhone\'da o\'rnatish uchun: pastdagi <b>Ulashish</b> tugmasini bosing → <b>"Bosh ekranga qo\'shish"</b>ni tanlang.',
+      up: "Yuqoriga", down: "Pastga", remove: "O'chirish", daqiqa: "daqiqa",
+      themeBtnTitle: (m) => m === "light" ? "Tongi rejim (bosib tungiga o'ting)" : "Tungi rejim (bosib tongiga o'ting)",
+      notifBtnTitle: (on) => on ? "Bildirishnomalar yoqilgan" : "Bildirishnomalarni yoqish",
+      notifNoSupport: "Bu brauzer bildirishnoma funksiyasini qo'llab-quvvatlamaydi. Sahifadagi eslatmalar baribir ko'rinaveradi.",
+      notifInsecure: "Bildirishnomalar faqat xavfsiz (https://) yoki localhost manzilda ishlaydi. Fayl to'g'ridan-to'g'ri (file://) ochilgan bo'lsa, brauzer ruxsat so'rovini avtomatik bloklaydi. Sahifani hosting qilgandan keyin (masalan GitHub Pages) bu tugma ishlaydi — hozircha sahifadagi eslatmalar baribir ko'rinaveradi.",
+      notifDenied: "Bildirishnomalar avval bloklangan. Brauzer sozlamalaridan shu sayt uchun ruxsatni qo'lda yoqing.",
+      notifDeniedRetry: "Ruxsat berilmadi — xohlagan vaqtingizda qayta urinib ko'rishingiz mumkin.",
+      notifError: "Bildirishnoma so'rovida kutilmagan xatolik yuz berdi.",
+      notifTitlePrefix: "Vaqti keldi: ",
+      alertBomdod: "Bomdod vaqtini kiriting.",
+      alertMinTask: "Kamida bitta vazifa qo'shing.",
+      confirmReset: "Vazifalar ro'yxatini standart holatga qaytarishni xohlaysizmi? Qo'shgan/o'zgartirgan vazifalaringiz yo'qoladi.",
+      warnTemplate: (over) => "Diqqat: ertalabki reja ish boshlanishidan " + over + " daqiqa keyin tugaydi. Reja siqilgan — vazifalar davomiyligini qisqartirishni ko'rib chiqing.",
+      freeAfterWork: "Ishdan keyin — shaxsiy vaqt / dam olish",
+      prayerPrep: (name) => name + " namoziga tayyorgarlik",
+      heroCurrentTask: "Hozirgi vazifa",
+      heroFreeNow: "Hozir bo'sh vaqt",
+      heroNext: (label) => "Keyingisi: " + label,
+      heroStartsAt: (time) => time + " dan boshlanadi",
+      minutesLeft: "daqiqa qoldi",
+      minutesUntil: "daqiqadan so'ng",
+      dayDoneTitle: "Kun yakunlandi",
+      dayDoneSub: "Bugungi barcha bosqichlar tugadi",
+      dayDoneReminder: "Ertaga yangi bomdod, yangi imkoniyat. Bugungi kichik g'alabalaring uchun ham shukr qil.",
+      emptyHint: "Qolgan bosqich yo'q — kun tugadi.",
+      ishLabelDefault: "Ish — syomka/montaj + rahbar topshiriqlari",
+      defaultTasks: [
+        { label: "Jismoniy shug'ullanish / trenirovka", duration: 35 },
+        { label: "Onlayn dars", duration: 60 },
+        { label: "Uy vazifalari", duration: 90 },
+        { label: "Kitob o'qish — shaxsiy rivojlanish", duration: 30 },
+        { label: "Oilaga qo'ng'iroq", duration: 10 },
+      ],
+      prayerNames: { peshin: "Peshin", asr: "Asr", shom: "Shom", xufton: "Xufton" },
+      reminders: [
+        "Payg'ambarimiz (s.a.v.) sog'liq va bo'sh vaqtni ko'p odamlar g'aflatda qoladigan ikki ne'mat, deb aytganlar (Buxoriy rivoyati). Shu daqiqani g'animat bil.",
+        "Besh narsani besh narsadan oldin qadrla, deyilgan hadisda — jumladan bandlikdan oldin bo'sh vaqtni. Hozir shu bo'sh vaqting, undan foydalan.",
+        "Kichik amal ham ixlos bilan qilinsa, katta ajr keltiradi. Niyatingni tuzatib, boshla.",
+        "Vaqt — qaytmas boylik. Har daqiqa foydali ishga sarflansa, umr baraka topadi.",
+        "Bugungi mehnating ertangi yengillashuving uchun sabab bo'ladi. Bismillah, boshla.",
+        "G'aflatdan uyg'on — bu payt ham, avvalgi paytlar kabi, qaytmaydi. Qo'lga ol.",
+      ],
+    },
+    en: {
+      dir: "ltr", locale: "en-US",
+      eyebrow: "Starting from Fajr",
+      settingsTitle: "Settings",
+      langSectionLabel: "Language",
+      themeSectionLabel: "Appearance",
+      themeDark: "Night mode",
+      themeLight: "Day mode",
+      tasksSectionLabel: "Tasks",
+      resetTasksBtn: "↺ Reset tasks to default",
+      aboutSectionLabel: "About the app",
+      aboutText: "Muthakkiroti — your personal companion that organizes your day starting from Fajr and reminds you at every step.",
+      panelTitle: "Build today's schedule",
+      panelSub: "Freely add, remove, or reorder your tasks — the schedule builds itself automatically around them.",
+      lblBomdod: "Fajr time",
+      lblPeshin: "Dhuhr", lblAsr: "Asr", lblShom: "Maghrib", lblXufton: "Isha",
+      optIxtiyoriy: "(optional)",
+      sectionTasks: "Tasks after Fajr (in order)",
+      newTaskPh: "New task name, e.g. Gym",
+      durPh: "min",
+      addTaskBtn: "+ Add",
+      sectionIsh: "Work hours",
+      lblIshStart: "Starts", lblIshEnd: "Ends", lblIshLabel: "Work description",
+      generateBtn: "Build / update schedule",
+      timelineTitle: "Today's thread",
+      upcomingTitle: "Upcoming stages",
+      footerNote: "Note: notifications only work while this page is open in your browser, and only on a secure (https or localhost) address. If you open the file directly (file://), the browser automatically blocks the permission request — this is a browser security rule, not an app bug. Once hosted (e.g. GitHub Pages) it works fully.",
+      iosHint: '📲 To install on iPhone: tap the <b>Share</b> button below → choose <b>"Add to Home Screen"</b>.',
+      up: "Up", down: "Down", remove: "Remove", daqiqa: "min",
+      themeBtnTitle: (m) => m === "light" ? "Day mode (tap for night)" : "Night mode (tap for day)",
+      notifBtnTitle: (on) => on ? "Notifications on" : "Turn on notifications",
+      notifNoSupport: "This browser doesn't support notifications. The on-screen reminders will still show up.",
+      notifInsecure: "Notifications only work on a secure (https://) or localhost address. If the file was opened directly (file://), the browser automatically blocks the permission request. Once hosted (e.g. GitHub Pages) this button will work — for now the on-screen reminders still show up.",
+      notifDenied: "Notifications were previously blocked. Enable permission for this site manually in your browser settings.",
+      notifDeniedRetry: "Permission wasn't granted — you can try again anytime.",
+      notifError: "An unexpected error occurred while requesting notification permission.",
+      notifTitlePrefix: "Time for: ",
+      alertBomdod: "Please enter your Fajr time.",
+      alertMinTask: "Please add at least one task.",
+      confirmReset: "Reset the task list to default? Tasks you added or changed will be lost.",
+      warnTemplate: (over) => "Note: your morning plan finishes " + over + " minutes after work starts. The schedule is tight — consider shortening some tasks.",
+      freeAfterWork: "After work — personal time / rest",
+      prayerPrep: (name) => "Getting ready for " + name,
+      heroCurrentTask: "Current task",
+      heroFreeNow: "Free time right now",
+      heroNext: (label) => "Next: " + label,
+      heroStartsAt: (time) => "starts at " + time,
+      minutesLeft: "min left",
+      minutesUntil: "min from now",
+      dayDoneTitle: "Day complete",
+      dayDoneSub: "All of today's stages are done",
+      dayDoneReminder: "A new Fajr tomorrow, a new opportunity. Be grateful for today's small wins too.",
+      emptyHint: "No stages left — the day is done.",
+      ishLabelDefault: "Work — filming/editing + manager's tasks",
+      defaultTasks: [
+        { label: "Physical exercise / workout", duration: 35 },
+        { label: "Online class", duration: 60 },
+        { label: "Homework", duration: 90 },
+        { label: "Reading — personal growth", duration: 30 },
+        { label: "Call family", duration: 10 },
+      ],
+      prayerNames: { peshin: "Dhuhr", asr: "Asr", shom: "Maghrib", xufton: "Isha" },
+      reminders: [
+        "The Prophet (ﷺ) said health and free time are two blessings many people are heedless of (Bukhari). Seize this moment.",
+        "\"Take benefit of five before five\" — including free time before being occupied. This is your free time now, use it.",
+        "Even a small deed done sincerely brings great reward. Fix your intention, and begin.",
+        "Time is wealth that never returns. Every minute spent well brings lasting benefit.",
+        "Today's effort is the reason tomorrow gets easier. Bismillah, begin.",
+        "Wake up from heedlessness — this moment, like the ones before it, won't come back. Take hold of it.",
+      ],
+    },
+    ar: {
+      dir: "rtl", locale: "ar-SA",
+      eyebrow: "يبدأ من الفجر",
+      settingsTitle: "الإعدادات",
+      langSectionLabel: "اللغة",
+      themeSectionLabel: "المظهر",
+      themeDark: "الوضع الليلي",
+      themeLight: "الوضع النهاري",
+      tasksSectionLabel: "المهام",
+      resetTasksBtn: "↺ إعادة المهام إلى الوضع الافتراضي",
+      aboutSectionLabel: "عن التطبيق",
+      aboutText: "مذكّراتي — رفيقك الشخصي الذي ينظم يومك بدءًا من الفجر ويذكّرك في كل خطوة.",
+      panelTitle: "جدول اليوم",
+      panelSub: "أضف أو احذف أو أعد ترتيب مهامك بحرية — يُبنى الجدول تلقائيًا حولها.",
+      lblBomdod: "وقت الفجر",
+      lblPeshin: "الظهر", lblAsr: "العصر", lblShom: "المغرب", lblXufton: "العشاء",
+      optIxtiyoriy: "(اختياري)",
+      sectionTasks: "المهام بعد الفجر (حسب الترتيب)",
+      newTaskPh: "اسم مهمة جديدة، مثال: النادي الرياضي",
+      durPh: "دقيقة",
+      addTaskBtn: "+ إضافة",
+      sectionIsh: "ساعات العمل",
+      lblIshStart: "البداية", lblIshEnd: "النهاية", lblIshLabel: "وصف العمل",
+      generateBtn: "إنشاء / تحديث الجدول",
+      timelineTitle: "خيط اليوم",
+      upcomingTitle: "المراحل القادمة",
+      footerNote: "ملاحظة: تعمل الإشعارات فقط أثناء فتح هذه الصفحة في المتصفح، وفقط على عنوان آمن (https أو localhost). إذا فتحت الملف مباشرة (file://) فسيقوم المتصفح تلقائيًا بحظر طلب الإذن — هذه قاعدة أمان للمتصفح وليست خطأ في التطبيق. بعد الاستضافة (مثل GitHub Pages) يعمل بشكل كامل.",
+      iosHint: '📲 للتثبيت على آيفون: اضغط زر <b>المشاركة</b> بالأسفل ← اختر <b>"إضافة إلى الشاشة الرئيسية"</b>.',
+      up: "للأعلى", down: "للأسفل", remove: "حذف", daqiqa: "دقيقة",
+      themeBtnTitle: (m) => m === "light" ? "الوضع النهاري (اضغط للوضع الليلي)" : "الوضع الليلي (اضغط للوضع النهاري)",
+      notifBtnTitle: (on) => on ? "الإشعارات مفعّلة" : "تفعيل الإشعارات",
+      notifNoSupport: "هذا المتصفح لا يدعم الإشعارات. ستظل التذكيرات تظهر في الصفحة.",
+      notifInsecure: "تعمل الإشعارات فقط على عنوان آمن (https://) أو localhost. إذا تم فتح الملف مباشرة (file://) فإن المتصفح يحظر طلب الإذن تلقائيًا. بعد الاستضافة (مثل GitHub Pages) سيعمل هذا الزر — حاليًا ستظل التذكيرات تظهر في الصفحة.",
+      notifDenied: "تم حظر الإشعارات مسبقًا. فعّل الإذن لهذا الموقع يدويًا من إعدادات المتصفح.",
+      notifDeniedRetry: "لم يُمنح الإذن — يمكنك المحاولة مرة أخرى في أي وقت.",
+      notifError: "حدث خطأ غير متوقع أثناء طلب إذن الإشعارات.",
+      notifTitlePrefix: "حان وقت: ",
+      alertBomdod: "الرجاء إدخال وقت الفجر.",
+      alertMinTask: "الرجاء إضافة مهمة واحدة على الأقل.",
+      confirmReset: "هل تريد إعادة قائمة المهام إلى الوضع الافتراضي؟ ستفقد المهام التي أضفتها أو غيّرتها.",
+      warnTemplate: (over) => "تنبيه: تنتهي خطة الصباح بعد بدء العمل بـ " + over + " دقيقة. الجدول ضيق — فكّر في تقصير بعض المهام.",
+      freeAfterWork: "بعد العمل — وقت شخصي / راحة",
+      prayerPrep: (name) => "الاستعداد لصلاة " + name,
+      heroCurrentTask: "المهمة الحالية",
+      heroFreeNow: "وقت فراغ الآن",
+      heroNext: (label) => "التالي: " + label,
+      heroStartsAt: (time) => "يبدأ الساعة " + time,
+      minutesLeft: "دقيقة متبقية",
+      minutesUntil: "دقيقة من الآن",
+      dayDoneTitle: "اكتمل اليوم",
+      dayDoneSub: "انتهت جميع مراحل اليوم",
+      dayDoneReminder: "فجر جديد غدًا، وفرصة جديدة. اشكر الله أيضًا على انتصاراتك الصغيرة اليوم.",
+      emptyHint: "لا توجد مراحل متبقية — انتهى اليوم.",
+      ishLabelDefault: "العمل — تصوير/مونتاج + مهام المدير",
+      defaultTasks: [
+        { label: "رياضة / تمرين بدني", duration: 35 },
+        { label: "درس عبر الإنترنت", duration: 60 },
+        { label: "الواجبات المنزلية", duration: 90 },
+        { label: "القراءة — تطوير الذات", duration: 30 },
+        { label: "الاتصال بالعائلة", duration: 10 },
+      ],
+      prayerNames: { peshin: "الظهر", asr: "العصر", shom: "المغرب", xufton: "العشاء" },
+      reminders: [
+        "قال النبي ﷺ إن الصحة والفراغ نعمتان يغبن فيهما كثير من الناس (رواه البخاري). اغتنم هذه اللحظة.",
+        "اغتنم خمسًا قبل خمس، ومنها فراغك قبل شغلك. هذا وقت فراغك الآن، فاستفد منه.",
+        "العمل القليل بإخلاص يجلب أجرًا عظيمًا. أصلح نيتك وابدأ.",
+        "الوقت ثروة لا تعود. كل دقيقة تُقضى في نافع تجلب بركة دائمة.",
+        "جهدك اليوم هو سبب سهولة غدك. بسم الله، ابدأ.",
+        "استيقظ من الغفلة — هذه اللحظة، مثل سابقاتها، لن تعود. اغتنمها.",
+      ],
+    },
+  };
+
+  let currentLang = "uz";
+  function T(){ return TRANSLATIONS[currentLang]; }
+  function randomReminder(){ const r = T().reminders; return r[Math.floor(Math.random()*r.length)]; }
   const $ = (id) => document.getElementById(id);
 
-  $("todayDate").textContent = new Date().toLocaleDateString("uz-UZ", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
-
   // ---------- Task list state ----------
-  let tasks = [
-    { id: 1, label: "Jismoniy shug'ullanish / trenirovka", duration: 35 },
-    { id: 2, label: "Onlayn dars", duration: 60 },
-    { id: 3, label: "Uy vazifalari", duration: 90 },
-    { id: 4, label: "Kitob o'qish — shaxsiy rivojlanish", duration: 30 },
-    { id: 5, label: "Oilaga qo'ng'iroq", duration: 10 },
-  ];
-  let nextTaskId = 6;
+  let tasks = [];
+  let nextTaskId = 1;
+  function seedDefaultTasks(){
+    tasks = T().defaultTasks.map((t) => ({ id: nextTaskId++, label: t.label, duration: t.duration }));
+  }
 
   function renderTaskList(){
     const wrap = $("taskListWrap");
@@ -444,10 +672,10 @@
       row.innerHTML =
         '<span class="drag-handle">' + (idx+1) + '.</span>' +
         '<input type="text" value="' + escapeAttr(task.label) + '" data-idx="' + idx + '" data-field="label" />' +
-        '<div><input type="number" min="5" step="5" value="' + task.duration + '" data-idx="' + idx + '" data-field="duration" /><div class="dur-lbl">daqiqa</div></div>' +
-        '<button class="icon-btn" data-action="up" data-idx="' + idx + '" title="Yuqoriga">↑</button>' +
-        '<button class="icon-btn" data-action="down" data-idx="' + idx + '" title="Pastga">↓</button>' +
-        '<button class="icon-btn danger" data-action="remove" data-idx="' + idx + '" title="O\'chirish">✕</button>';
+        '<div><input type="number" min="5" step="5" value="' + task.duration + '" data-idx="' + idx + '" data-field="duration" /><div class="dur-lbl">' + T().daqiqa + '</div></div>' +
+        '<button class="icon-btn" data-action="up" data-idx="' + idx + '" title="' + T().up + '">↑</button>' +
+        '<button class="icon-btn" data-action="down" data-idx="' + idx + '" title="' + T().down + '">↓</button>' +
+        '<button class="icon-btn danger" data-action="remove" data-idx="' + idx + '" title="' + T().remove + '">✕</button>';
       wrap.appendChild(row);
     });
   }
@@ -485,20 +713,54 @@
     renderTaskList();
     labelInput.focus();
   });
-  renderTaskList();
+
+
+  // ---------- Language ----------
+  function applyLanguage(lang){
+    currentLang = TRANSLATIONS[lang] ? lang : "uz";
+    const t = T();
+    document.documentElement.setAttribute("lang", currentLang);
+    document.documentElement.setAttribute("dir", t.dir);
+
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const key = el.getAttribute("data-i18n");
+      if (t[key] !== undefined) el.textContent = t[key];
+    });
+    $("iosHintText").innerHTML = t.iosHint;
+    $("footerNoteText").textContent = t.footerNote;
+    $("newTaskLabel").placeholder = t.newTaskPh;
+    $("newTaskDur").placeholder = t.durPh;
+
+    $("langUz").classList.toggle("active", currentLang === "uz");
+    $("langEn").classList.toggle("active", currentLang === "en");
+    $("langAr").classList.toggle("active", currentLang === "ar");
+
+    const themeMode = document.documentElement.getAttribute("data-theme") || "dark";
+    themeBtn.title = t.themeBtnTitle(themeMode);
+    notifBtn.title = t.notifBtnTitle(notifOn);
+    $("installBtn").title = currentLang === "en" ? "Install app" : currentLang === "ar" ? "تثبيت التطبيق" : "Ilovani o'rnatish";
+
+    if (!scheduleEverBuilt) {
+      seedDefaultTasks();
+      $("ishLabel").value = t.ishLabelDefault;
+    }
+    renderTaskList();
+    $("todayDate").textContent = new Date().toLocaleDateString(t.locale, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+
+    if (events.length) renderAll();
+    try { localStorage.setItem("muthakkiroti_lang", currentLang); } catch(e){}
+  }
+  $("langUz").addEventListener("click", () => applyLanguage("uz"));
+  $("langEn").addEventListener("click", () => applyLanguage("en"));
+  $("langAr").addEventListener("click", () => applyLanguage("ar"));
 
   // ---------- Theme (tungi / tongi rejim) ----------
   const themeBtn = $("themeBtn");
   const themeIcon = $("themeIcon");
   function applyTheme(mode){
     document.documentElement.setAttribute("data-theme", mode);
-    if (mode === "light") {
-      themeIcon.textContent = "☀️";
-      themeBtn.title = "Tongi rejim (bosib tungiga o'ting)";
-    } else {
-      themeIcon.textContent = "🌙";
-      themeBtn.title = "Tungi rejim (bosib tongiga o'ting)";
-    }
+    themeIcon.textContent = mode === "light" ? "☀️" : "🌙";
+    themeBtn.title = T().themeBtnTitle(mode);
     $("themeOptDark").classList.toggle("active", mode === "dark");
     $("themeOptLight").classList.toggle("active", mode === "light");
     try { localStorage.setItem("muthakkiroti_theme", mode); } catch(e){}
@@ -525,15 +787,8 @@
   });
 
   $("resetTasksBtn").addEventListener("click", () => {
-    if (!confirm("Vazifalar ro'yxatini standart holatga qaytarishni xohlaysizmi? Qo'shgan/o'zgartirgan vazifalaringiz yo'qoladi.")) return;
-    tasks = [
-      { id: 1, label: "Jismoniy shug'ullanish / trenirovka", duration: 35 },
-      { id: 2, label: "Onlayn dars", duration: 60 },
-      { id: 3, label: "Uy vazifalari", duration: 90 },
-      { id: 4, label: "Kitob o'qish — shaxsiy rivojlanish", duration: 30 },
-      { id: 5, label: "Oilaga qo'ng'iroq", duration: 10 },
-    ];
-    nextTaskId = 6;
+    if (!confirm(T().confirmReset)) return;
+    seedDefaultTasks();
     renderTaskList();
     settingsBackdrop.classList.remove("show");
   });
@@ -551,15 +806,15 @@
   notifBtn.addEventListener("click", async () => {
     hideNotifMsg();
     if (!("Notification" in window)) {
-      showNotifMsg("Bu brauzer bildirishnoma funksiyasini qo'llab-quvvatlamaydi. Sahifadagi eslatmalar baribir ko'rinaveradi.");
+      showNotifMsg(T().notifNoSupport);
       return;
     }
     if (!window.isSecureContext) {
-      showNotifMsg("Bildirishnomalar faqat xavfsiz (https://) yoki localhost manzilda ishlaydi. Fayl to'g'ridan-to'g'ri (file://) ochilgan bo'lsa, brauzer ruxsat so'rovini avtomatik bloklaydi. Sahifani hosting qilgandan keyin (masalan GitHub Pages) bu tugma ishlaydi — hozircha sahifadagi eslatmalar baribir ko'rinaveradi.");
+      showNotifMsg(T().notifInsecure);
       return;
     }
     if (Notification.permission === "denied") {
-      showNotifMsg("Bildirishnomalar avval bloklangan. Brauzer sozlamalaridan shu sayt uchun ruxsatni qo'lda yoqing.");
+      showNotifMsg(T().notifDenied);
       return;
     }
     if (Notification.permission === "granted") {
@@ -570,60 +825,62 @@
     try {
       const perm = await Notification.requestPermission();
       if (perm === "granted") { notifOn = true; updateNotifBtn(); }
-      else { showNotifMsg("Ruxsat berilmadi — xohlagan vaqtingizda qayta urinib ko'rishingiz mumkin."); }
+      else { showNotifMsg(T().notifDeniedRetry); }
     } catch (e) {
-      showNotifMsg("Bildirishnoma so'rovida kutilmagan xatolik yuz berdi.");
+      showNotifMsg(T().notifError);
     }
   });
   function updateNotifBtn(){
     notifBtn.classList.toggle("on", notifOn);
-    notifBtn.title = notifOn ? "Bildirishnomalar yoqilgan" : "Bildirishnomalarni yoqish";
+    notifBtn.title = T().notifBtnTitle(notifOn);
   }
 
   // ---------- Schedule state ----------
   let events = [];
   let firedIds = new Set();
+  let scheduleEverBuilt = false;
 
   function toMinutes(hhmm){ const [h,m] = hhmm.split(":").map(Number); return h*60+m; }
   function todayAt(minutes){ const d = new Date(); d.setHours(0,0,0,0); d.setMinutes(minutes); return d; }
-  function fmt(d){ return d.toLocaleTimeString("uz-UZ", { hour:"2-digit", minute:"2-digit" }); }
+  function fmt(d){ return d.toLocaleTimeString(T().locale, { hour:"2-digit", minute:"2-digit" }); }
   function minutesBetween(a,b){ return Math.round((b-a)/60000); }
 
   function buildSchedule(){
+    scheduleEverBuilt = true;
     const bomdodStr = $("bomdod").value;
-    if (!bomdodStr){ alert("Bomdod vaqtini kiriting."); return; }
-    if (tasks.length === 0){ alert("Kamida bitta vazifa qo'shing."); return; }
+    if (!bomdodStr){ alert(T().alertBomdod); return; }
+    if (tasks.length === 0){ alert(T().alertMinTask); return; }
 
     let t = toMinutes(bomdodStr);
     const blocks = [];
     tasks.forEach((task) => {
       const s = t, e = t + task.duration;
-      blocks.push({ startMin: s, endMin: e, label: task.label || "Vazifa", type: "task" });
+      blocks.push({ startMin: s, endMin: e, label: task.label || "—", type: "task" });
       t = e;
     });
     const morningEnd = t;
 
     const ishStart = toMinutes($("ishStart").value || "09:00");
     const ishEnd = toMinutes($("ishEnd").value || "18:00");
-    const ishLabel = $("ishLabel").value.trim() || "Ish";
+    const ishLabel = $("ishLabel").value.trim() || T().sectionIsh;
 
     const warnBox = $("warnBox");
     if (morningEnd > ishStart) {
       const over = morningEnd - ishStart;
-      warnBox.textContent = "Diqqat: ertalabki reja ish boshlanishidan " + over + " daqiqa keyin tugaydi. Reja siqilgan — vazifalar davomiyligini qisqartirishni ko'rib chiqing.";
+      warnBox.textContent = T().warnTemplate(over);
       warnBox.classList.add("show");
     } else {
       warnBox.classList.remove("show");
     }
 
     blocks.push({ startMin: ishStart, endMin: ishEnd, label: ishLabel, type: "work" });
-    blocks.push({ startMin: ishEnd, endMin: ishEnd + 5*60, label: "Ishdan keyin — shaxsiy vaqt / dam olish", type: "free" });
+    blocks.push({ startMin: ishEnd, endMin: ishEnd + 5*60, label: T().freeAfterWork, type: "free" });
 
     ["peshin","asr","shom","xufton"].forEach((id) => {
       const v = $(id).value;
       if (v) {
         const m = toMinutes(v);
-        blocks.push({ startMin: m - 10, endMin: m, label: (id[0].toUpperCase()+id.slice(1)) + " namoziga tayyorgarlik", type: "prayer" });
+        blocks.push({ startMin: m - 10, endMin: m, label: T().prayerPrep(T().prayerNames[id]), type: "prayer" });
       }
     });
 
@@ -658,18 +915,19 @@
   function renderHero(now){
     const hero = $("heroCard");
     const idx = currentBlockIndex(now);
+    const t = T();
     if (idx >= 0){
       const ev = events[idx];
       const remain = Math.max(0, minutesBetween(now, ev.end));
-      hero.innerHTML = '<p class="eyebrow">Hozirgi vazifa</p><h2>' + ev.label + '</h2><p class="range">' + fmt(ev.start) + ' — ' + fmt(ev.end) + '</p><div class="countdown"><span class="num">' + remain + '</span><span class="lbl">daqiqa qoldi</span></div><div class="reminder">' + randomReminderStable(ev.id) + '</div>';
+      hero.innerHTML = '<p class="eyebrow">' + t.heroCurrentTask + '</p><h2>' + ev.label + '</h2><p class="range">' + fmt(ev.start) + ' — ' + fmt(ev.end) + '</p><div class="countdown"><span class="num">' + remain + '</span><span class="lbl">' + t.minutesLeft + '</span></div><div class="reminder">' + randomReminderStable(ev.id) + '</div>';
     } else {
       const nIdx = nextBlockIndex(now);
       if (nIdx >= 0){
         const ev = events[nIdx];
         const until = Math.max(0, minutesBetween(now, ev.start));
-        hero.innerHTML = '<p class="eyebrow">Hozir bo\'sh vaqt</p><h2>Keyingisi: ' + ev.label + '</h2><p class="range">' + fmt(ev.start) + ' dan boshlanadi</p><div class="countdown"><span class="num">' + until + '</span><span class="lbl">daqiqadan so\'ng</span></div><div class="reminder">' + randomReminder() + '</div>';
+        hero.innerHTML = '<p class="eyebrow">' + t.heroFreeNow + '</p><h2>' + t.heroNext(ev.label) + '</h2><p class="range">' + t.heroStartsAt(fmt(ev.start)) + '</p><div class="countdown"><span class="num">' + until + '</span><span class="lbl">' + t.minutesUntil + '</span></div><div class="reminder">' + randomReminder() + '</div>';
       } else {
-        hero.innerHTML = '<p class="eyebrow">Kun yakunlandi</p><h2>Bugungi barcha bosqichlar tugadi</h2><div class="reminder">Ertaga yangi bomdod, yangi imkoniyat. Bugungi kichik g\'alabalaring uchun ham shukr qil.</div>';
+        hero.innerHTML = '<p class="eyebrow">' + t.dayDoneTitle + '</p><h2>' + t.dayDoneSub + '</h2><div class="reminder">' + t.dayDoneReminder + '</div>';
       }
     }
   }
@@ -678,7 +936,7 @@
     const wrap = $("upcomingList");
     wrap.innerHTML = "";
     const rest = events.filter(ev => ev.start > now).slice(0,5);
-    if (rest.length === 0){ wrap.innerHTML = '<p class="empty-hint">Qolgan bosqich yo\'q — kun tugadi.</p>'; return; }
+    if (rest.length === 0){ wrap.innerHTML = '<p class="empty-hint">' + T().emptyHint + '</p>'; return; }
     rest.forEach((ev) => {
       const item = document.createElement("div");
       item.className = "upcoming-item";
@@ -693,7 +951,7 @@
       const diff = Math.abs(now - ev.start);
       if (now >= ev.start && diff < 30000 && !firedIds.has(ev.id)) {
         firedIds.add(ev.id);
-        try { new Notification("Vaqti keldi: " + ev.label, { body: randomReminderStable(ev.id) }); } catch(e){}
+        try { new Notification(T().notifTitlePrefix + ev.label, { body: randomReminderStable(ev.id) }); } catch(e){}
       }
     });
   }
@@ -728,6 +986,14 @@
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
   if (isIOS && !isStandalone) { $("iosHint").classList.add("show"); }
+
+  // ---------- Initial language load (must run after all elements/handlers above are ready) ----------
+  let savedLang = "uz";
+  try {
+    const browserLang = (navigator.language || "uz").slice(0,2);
+    savedLang = localStorage.getItem("muthakkiroti_lang") || (TRANSLATIONS[browserLang] ? browserLang : "uz");
+  } catch(e){}
+  applyLanguage(savedLang);
 })();
 </script>
 </body>
