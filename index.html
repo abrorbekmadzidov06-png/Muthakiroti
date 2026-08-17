@@ -64,6 +64,21 @@
   h1{ font-family:'Fraunces', serif; font-weight: 600; font-size: clamp(1.9rem, 3.4vw, 2.6rem); margin: 0; letter-spacing: -0.01em; }
   .today-date{ color: var(--text-muted); font-size: 0.92rem; margin-top: 0.35rem; }
   .header-actions{ display:flex; gap:0.6rem; flex-wrap:wrap; }
+  .icon-circle{
+    background: var(--bg-panel); border: 1px solid var(--line); color: var(--text);
+    width: 46px; height: 46px; border-radius: 50%; cursor: pointer;
+    display:flex; align-items:center; justify-content:center; position:relative;
+    font-size: 1.15rem; transition: border-color .15s ease, background .15s ease, transform .1s ease;
+    flex: 0 0 auto; padding: 0;
+  }
+  .icon-circle:hover{ border-color: var(--gold); transform: translateY(-1px); }
+  .icon-circle:active{ transform: translateY(0); }
+  .icon-circle.on{ background: var(--mint-dim); border-color: var(--mint); }
+  .icon-circle .dot{
+    position:absolute; top:6px; right:6px; width:8px; height:8px; border-radius:50%;
+    background: var(--text-faint); border: 1.5px solid var(--bg-panel);
+  }
+  .icon-circle.on .dot{ background: var(--mint); box-shadow: 0 0 6px var(--mint); }
   .btn-pill{
     background: var(--bg-panel); border: 1px solid var(--line); color: var(--text);
     padding: 0.65rem 1.1rem; border-radius: 999px; font-family: 'Inter', sans-serif;
@@ -214,6 +229,54 @@
   .theme-opt-icon{ font-size:1.6rem; }
   .theme-opt.active{ border-color: var(--gold); color: var(--text); }
   .about-text{ color: var(--text-muted); font-size: 0.85rem; line-height:1.6; margin: 0 0 0.4rem; }
+
+  /* ---------- Mobile responsiveness ---------- */
+  @media (max-width: 600px){
+    .wrap{ padding: 1.3rem 1rem 3rem; }
+    header.top{ margin-bottom: 1rem; }
+    h1{ font-size: 1.6rem; }
+    .brand-eyebrow{ font-size: 0.64rem; }
+    .today-date{ font-size: 0.8rem; }
+    .header-actions{ gap: 0.45rem; }
+    .icon-circle{ width: 40px; height: 40px; font-size: 1rem; }
+
+    .panel{ padding: 1.2rem 1.1rem; border-radius: 14px; }
+    .panel h2{ font-size: 1.02rem; }
+    .grid-inputs{ grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+    .section-label{ margin: 1.1rem 0 0.6rem; }
+
+    .task-row{
+      display:flex; flex-wrap: wrap; align-items:center;
+      grid-template-columns: unset;
+    }
+    .task-row .drag-handle{ flex: 0 0 auto; }
+    .task-row input[type="text"]{ flex: 1 1 auto; min-width: 100px; }
+    .task-row > div{ flex: 0 0 68px; }
+    .task-row .icon-btn{ flex: 0 0 auto; width: 28px; height: 28px; font-size: 0.78rem; }
+
+    .add-task-row{
+      display:flex; flex-wrap: wrap; grid-template-columns: unset;
+    }
+    .add-task-row input[type="text"]{ flex: 1 1 100%; }
+    .add-task-row input[type="number"]{ flex: 1 1 70px; }
+    .add-task-row .add-btn{ flex: 1 1 auto; }
+
+    .generate-btn{ width: 100%; }
+
+    .hero{ padding: 1.4rem 1.3rem; border-radius: 16px; }
+    .hero h2{ font-size: 1.3rem; }
+    .hero .countdown .num{ font-size: 1.5rem; }
+    .reminder{ font-size: 0.87rem; padding: 0.8rem 1rem; }
+
+    .timeline{ padding: 1.1rem 0.9rem; }
+
+    .modal{ padding: 1.4rem 1.2rem; max-width: 94vw; }
+    .theme-choice{ gap: 0.5rem; }
+    .theme-opt{ padding: 0.8rem 0.4rem; font-size: 0.8rem; }
+  }
+  @media (max-width: 360px){
+    .grid-inputs{ grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -226,21 +289,19 @@
       <p class="today-date" id="todayDate"></p>
     </div>
     <div class="header-actions">
-      <button class="btn-pill" id="themeBtn" type="button" title="Tungi/Tongi rejim">
+      <button class="icon-circle" id="themeBtn" type="button" title="Tungi rejim">
         <span id="themeIcon">🌙</span>
-        <span id="themeBtnText">Tungi rejim</span>
       </button>
-      <button class="btn-pill" id="settingsBtn" type="button" title="Sozlamalar">
+      <button class="icon-circle" id="settingsBtn" type="button" title="Sozlamalar">
         <span>⚙️</span>
-        <span>Sozlamalar</span>
       </button>
-      <button class="btn-pill" id="installBtn" type="button" style="display:none;">
+      <button class="icon-circle" id="installBtn" type="button" title="Ilovani o'rnatish" style="display:none;">
+        <span>📲</span>
         <span class="dot" style="background:var(--gold);box-shadow:0 0 8px var(--gold);"></span>
-        <span>Ilovani o'rnatish</span>
       </button>
-      <button class="btn-pill" id="notifBtn" type="button">
+      <button class="icon-circle" id="notifBtn" type="button" title="Bildirishnomalarni yoqish">
+        <span>🔔</span>
         <span class="dot"></span>
-        <span id="notifBtnText">Bildirishnomalarni yoqish</span>
       </button>
     </div>
   </header>
@@ -429,15 +490,14 @@
   // ---------- Theme (tungi / tongi rejim) ----------
   const themeBtn = $("themeBtn");
   const themeIcon = $("themeIcon");
-  const themeBtnText = $("themeBtnText");
   function applyTheme(mode){
     document.documentElement.setAttribute("data-theme", mode);
     if (mode === "light") {
       themeIcon.textContent = "☀️";
-      themeBtnText.textContent = "Tongi rejim";
+      themeBtn.title = "Tongi rejim (bosib tungiga o'ting)";
     } else {
       themeIcon.textContent = "🌙";
-      themeBtnText.textContent = "Tungi rejim";
+      themeBtn.title = "Tungi rejim (bosib tongiga o'ting)";
     }
     $("themeOptDark").classList.toggle("active", mode === "dark");
     $("themeOptLight").classList.toggle("active", mode === "light");
@@ -481,7 +541,6 @@
   // ---------- Notifications ----------
   let notifOn = false;
   const notifBtn = $("notifBtn");
-  const notifBtnText = $("notifBtnText");
   const notifMsg = $("notifMsg");
   function showNotifMsg(text){
     notifMsg.textContent = text;
@@ -518,7 +577,7 @@
   });
   function updateNotifBtn(){
     notifBtn.classList.toggle("on", notifOn);
-    notifBtnText.textContent = notifOn ? "Bildirishnomalar yoqilgan" : "Bildirishnomalarni yoqish";
+    notifBtn.title = notifOn ? "Bildirishnomalar yoqilgan" : "Bildirishnomalarni yoqish";
   }
 
   // ---------- Schedule state ----------
