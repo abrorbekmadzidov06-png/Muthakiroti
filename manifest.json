@@ -1,0 +1,16 @@
+{
+  "name": "Kun tartibim",
+  "short_name": "Kun tartibim",
+  "description": "Bomdoddan boshlanadigan kunlik reja va eslatma ilovasi",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d2118",
+  "theme_color": "#0d2118",
+  "lang": "uz",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
