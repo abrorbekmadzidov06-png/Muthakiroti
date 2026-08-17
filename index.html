@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Kun tartibim</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d2118">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kun tartibim">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0d2118;
+    --bg-panel: #15301f;
+    --bg-panel-2: #1b3d27;
+    --line: #2f5a3f;
+    --gold: #e8b04b;
+    --mint: #6fcf97;
+    --mint-dim: #204a34;
+    --text: #eef7f0;
+    --text-muted: #9fc2ac;
+    --text-faint: #5f8a71;
+    --danger: #e08a7d;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: radial-gradient(ellipse 900px 500px at 15% -10%, #1e4530 0%, transparent 60%), var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap{ max-width: 1180px; margin: 0 auto; padding: 2.2rem 1.5rem 4rem; }
+  header.top{ display:flex; align-items:flex-start; justify-content:space-between; gap: 1rem; margin-bottom: 1.4rem; flex-wrap: wrap; }
+  .brand-eyebrow{ font-family:'JetBrains Mono', monospace; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin: 0 0 0.4rem; }
+  h1{ font-family:'Fraunces', serif; font-weight: 600; font-size: clamp(1.9rem, 3.4vw, 2.6rem); margin: 0; letter-spacing: -0.01em; }
+  .today-date{ color: var(--text-muted); font-size: 0.92rem; margin-top: 0.35rem; }
+  .header-actions{ display:flex; gap:0.6rem; flex-wrap:wrap; }
+  .btn-pill{
+    background: var(--bg-panel); border: 1px solid var(--line); color: var(--text);
+    padding: 0.65rem 1.1rem; border-radius: 999px; font-family: 'Inter', sans-serif;
+    font-size: 0.85rem; cursor: pointer; display:flex; align-items:center; gap:0.5rem;
+    transition: border-color .15s ease, background .15s ease; white-space: nowrap;
+  }
+  .btn-pill:hover{ border-color: var(--gold); }
+  .btn-pill.on{ background: var(--mint-dim); border-color: var(--mint); color: #dff7ea; }
+  .dot{ width:8px; height:8px; border-radius:50%; background: var(--text-faint); flex:none; }
+  .btn-pill.on .dot{ background: var(--mint); box-shadow: 0 0 8px var(--mint); }
+  .notif-msg{
+    display:none; background: var(--bg-panel); border:1px solid var(--gold); color: var(--text);
+    border-radius: 12px; padding: 0.8rem 1rem; font-size: 0.84rem; line-height:1.5; margin-bottom: 1.2rem;
+  }
+  .notif-msg.show{ display:block; }
+  .ios-hint{ display:none; background: var(--bg-panel); border:1px solid var(--gold); border-radius: 14px; padding: 0.9rem 1.1rem; margin-bottom: 1.2rem; font-size: 0.85rem; line-height:1.6; }
+  .ios-hint.show{ display:block; }
+  .ios-hint b{ color: var(--gold); }
+
+  .panel{ background: var(--bg-panel); border: 1px solid var(--line); border-radius: 18px; padding: 1.6rem 1.7rem; margin-bottom: 1.4rem; }
+  .panel h2{ font-family:'Fraunces', serif; font-weight:600; font-size:1.15rem; margin: 0 0 0.3rem; }
+  .panel .sub{ color: var(--text-muted); font-size: 0.86rem; margin: 0 0 1.2rem; line-height:1.5; }
+
+  .grid-inputs{ display:grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 1rem 1.2rem; margin-bottom: 0.4rem; }
+  .field label{ display:block; font-size: 0.78rem; color: var(--text-muted); margin-bottom:0.35rem; font-weight:500; }
+  .field .opt{ color: var(--text-faint); font-weight:400; }
+  .field input[type="time"], .field input[type="text"]{
+    width:100%; background: var(--bg-panel-2); border:1px solid var(--line); color: var(--text);
+    border-radius: 10px; padding: 0.6rem 0.7rem; font-family:'JetBrains Mono', monospace; font-size: 0.9rem;
+  }
+  .field input:focus{ outline:2px solid var(--gold); outline-offset:1px; }
+
+  .section-label{ font-family:'JetBrains Mono', monospace; font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase; color: var(--text-faint); margin: 1.4rem 0 0.7rem; }
+
+  /* Task list editor */
+  .task-row{
+    display:grid; grid-template-columns: auto 1fr 90px auto auto auto; align-items:center;
+    gap: 0.6rem; background: var(--bg-panel-2); border:1px solid var(--line); border-radius: 12px;
+    padding: 0.55rem 0.7rem; margin-bottom: 0.55rem;
+  }
+  .task-row input[type="text"]{ background:transparent; border:none; color:var(--text); font-family:'Inter',sans-serif; font-size:0.92rem; padding:0.3rem; }
+  .task-row input[type="text"]:focus{ outline:1px solid var(--gold); border-radius:6px; }
+  .task-row input[type="number"]{
+    width:100%; background: var(--bg-panel); border:1px solid var(--line); color: var(--gold);
+    border-radius: 8px; padding: 0.35rem 0.4rem; font-family:'JetBrains Mono', monospace; font-size:0.85rem; text-align:center;
+  }
+  .task-row .dur-lbl{ font-size:0.68rem; color:var(--text-faint); text-align:center; margin-top:2px; }
+  .icon-btn{
+    background: none; border: 1px solid var(--line); color: var(--text-muted); width: 30px; height:30px;
+    border-radius: 8px; cursor:pointer; font-size:0.85rem; display:flex; align-items:center; justify-content:center;
+    transition: border-color .15s, color .15s;
+  }
+  .icon-btn:hover{ border-color: var(--gold); color: var(--gold); }
+  .icon-btn.danger:hover{ border-color: var(--danger); color: var(--danger); }
+  .drag-handle{ color: var(--text-faint); font-size:0.9rem; cursor:default; padding: 0 0.2rem; }
+
+  .add-task-row{
+    display:grid; grid-template-columns: 1fr 90px auto; gap:0.6rem; align-items:center;
+    border: 1px dashed var(--line); border-radius: 12px; padding: 0.55rem 0.7rem; margin-top: 0.3rem;
+  }
+  .add-task-row input[type="text"]{
+    background: var(--bg-panel-2); border:1px solid var(--line); color:var(--text); border-radius:8px;
+    padding: 0.5rem 0.6rem; font-family:'Inter',sans-serif; font-size:0.88rem;
+  }
+  .add-task-row input[type="number"]{
+    background: var(--bg-panel-2); border:1px solid var(--line); color:var(--gold); border-radius:8px;
+    padding: 0.5rem 0.4rem; font-family:'JetBrains Mono', monospace; font-size:0.85rem; text-align:center;
+  }
+  .add-btn{
+    background: var(--mint-dim); border:1px solid var(--mint); color:#dff7ea; border-radius:8px;
+    padding: 0.5rem 0.9rem; font-size:0.85rem; cursor:pointer; font-family:'Inter',sans-serif; font-weight:600;
+    white-space:nowrap;
+  }
+  .add-btn:hover{ filter: brightness(1.1); }
+
+  .generate-btn{
+    background: var(--gold); color:#1c1406; border:none; border-radius: 12px; padding: 0.85rem 1.4rem;
+    font-size:0.95rem; font-weight:600; cursor:pointer; font-family:'Inter', sans-serif; margin-top: 1.3rem;
+    transition: filter .15s ease, transform .1s ease;
+  }
+  .generate-btn:hover{ filter: brightness(1.08); }
+  .generate-btn:active{ transform: scale(0.98); }
+
+  .warn{ background: #3a2320; border:1px solid #7a4038; color:#f3c8ce; border-radius: 12px; padding: 0.8rem 1rem; font-size:0.85rem; margin-top:1rem; display:none; line-height:1.5; }
+  .warn.show{ display:block; }
+
+  .stage{ display:none; }
+  .stage.show{ display:grid; grid-template-columns: 230px 1fr; gap: 1.8rem; align-items:start; }
+  @media (max-width: 820px){ .stage.show{ grid-template-columns: 1fr; } }
+
+  .timeline{ position: sticky; top: 1.5rem; display:flex; flex-direction:column; background: var(--bg-panel); border:1px solid var(--line); border-radius: 18px; padding: 1.4rem 1.2rem; }
+  @media (max-width: 820px){ .timeline{ position: static; } }
+  .timeline h3{ font-family:'JetBrains Mono', monospace; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; color: var(--text-faint); margin: 0 0 1rem; }
+  .bead-row{ display:flex; gap: 0.7rem; padding: 0.55rem 0; position:relative; }
+  .bead-track{ position:relative; width:14px; display:flex; justify-content:center; flex:none; }
+  .bead-track::before{ content:""; position:absolute; top:-0.55rem; bottom:-0.55rem; width:2px; background: var(--line); left:50%; transform:translateX(-50%); }
+  .bead-row:first-child .bead-track::before{ top:50%; }
+  .bead-row:last-child .bead-track::before{ bottom:50%; }
+  .bead{ width:12px; height:12px; border-radius:50%; background: var(--bg); border:2px solid var(--text-faint); position:relative; z-index:1; margin-top:2px; flex:none; }
+  .bead-row.done .bead{ background: var(--mint); border-color: var(--mint); }
+  .bead-row.active .bead{ background: var(--gold); border-color: var(--gold); box-shadow: 0 0 0 4px rgba(232,176,75,0.22); animation: pulse 1.8s ease-in-out infinite; }
+  .bead-row.prayer .bead{ border-color: var(--mint); }
+  @keyframes pulse{ 0%,100%{ box-shadow: 0 0 0 4px rgba(232,176,75,0.22); } 50%{ box-shadow: 0 0 0 7px rgba(232,176,75,0.10); } }
+  .bead-info{ padding-bottom: 0.1rem; }
+  .bead-time{ font-family:'JetBrains Mono', monospace; font-size:0.72rem; color: var(--text-faint); }
+  .bead-row.active .bead-time{ color: var(--gold); }
+  .bead-label{ font-size:0.82rem; color: var(--text-muted); margin-top:0.1rem; line-height:1.3; }
+  .bead-row.active .bead-label{ color: var(--text); font-weight:600; }
+  .bead-row.done .bead-label{ color: var(--text-faint); text-decoration: line-through; text-decoration-color: var(--line); }
+
+  .hero{ background: linear-gradient(160deg, var(--bg-panel-2), var(--bg-panel)); border: 1px solid var(--line); border-radius: 20px; padding: 2rem 2.1rem; margin-bottom: 1.4rem; }
+  .hero .eyebrow{ font-family:'JetBrains Mono', monospace; font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; color: var(--gold); margin:0 0 0.6rem; }
+  .hero h2{ font-family:'Fraunces', serif; font-weight:700; font-size: clamp(1.5rem, 2.6vw, 2.1rem); margin: 0 0 0.5rem; line-height:1.15; }
+  .hero .range{ font-family:'JetBrains Mono', monospace; color: var(--text-muted); font-size:0.95rem; margin-bottom:1.1rem; }
+  .hero .countdown{ display:inline-flex; align-items:baseline; gap:0.4rem; margin-bottom:1.3rem; }
+  .hero .countdown .num{ font-family:'Fraunces', serif; font-size:1.9rem; font-weight:600; color: var(--gold); }
+  .hero .countdown .lbl{ color: var(--text-muted); font-size:0.85rem; }
+  .reminder{ background: rgba(111,207,151,0.12); border-left: 3px solid var(--mint); padding: 0.95rem 1.15rem; border-radius: 0 10px 10px 0; font-size:0.93rem; line-height:1.55; color: #e3f7ec; }
+  .upcoming-title{ font-family:'JetBrains Mono', monospace; font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase; color: var(--text-faint); margin: 0 0 0.8rem; }
+  .upcoming-list{ display:flex; flex-direction:column; gap:0.6rem; }
+  .upcoming-item{ display:flex; justify-content:space-between; align-items:center; background: var(--bg-panel); border:1px solid var(--line); border-radius:12px; padding: 0.75rem 1rem; font-size:0.88rem; }
+  .upcoming-item .t{ font-family:'JetBrains Mono', monospace; color: var(--text-muted); font-size:0.82rem; }
+  .upcoming-item .l{ color: var(--text); }
+  .empty-hint{ color: var(--text-faint); font-size:0.85rem; margin-top:0.4rem; }
+  footer.note{ margin-top: 2.2rem; color: var(--text-faint); font-size: 0.78rem; line-height:1.6; border-top: 1px solid var(--line); padding-top: 1.2rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <p class="brand-eyebrow">Bomdoddan boshlanadi</p>
+      <h1>Kun tartibim</h1>
+      <p class="today-date" id="todayDate"></p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-pill" id="installBtn" type="button" style="display:none;">
+        <span class="dot" style="background:var(--gold);box-shadow:0 0 8px var(--gold);"></span>
+        <span>Ilovani o'rnatish</span>
+      </button>
+      <button class="btn-pill" id="notifBtn" type="button">
+        <span class="dot"></span>
+        <span id="notifBtnText">Bildirishnomalarni yoqish</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="ios-hint" id="iosHint">📲 iPhone'da o'rnatish uchun: pastdagi <b>Ulashish</b> tugmasini bosing → <b>"Bosh ekranga qo'shish"</b>ni tanlang.</div>
+  <div class="notif-msg" id="notifMsg"></div>
+
+  <section class="panel" id="setupPanel">
+    <h2>Bugungi jadvalni tuzing</h2>
+    <p class="sub">Vazifalaringizni erkin qo'shing, o'chiring yoki tartibini o'zgartiring — jadval shularga qarab avtomatik tuziladi.</p>
+
+    <div class="grid-inputs">
+      <div class="field">
+        <label for="bomdod">Bomdod vaqti</label>
+        <input type="time" id="bomdod" value="05:10" />
+      </div>
+      <div class="field">
+        <label for="peshin">Peshin <span class="opt">(ixtiyoriy)</span></label>
+        <input type="time" id="peshin" />
+      </div>
+      <div class="field">
+        <label for="asr">Asr <span class="opt">(ixtiyoriy)</span></label>
+        <input type="time" id="asr" />
+      </div>
+      <div class="field">
+        <label for="shom">Shom <span class="opt">(ixtiyoriy)</span></label>
+        <input type="time" id="shom" />
+      </div>
+      <div class="field">
+        <label for="xufton">Xufton <span class="opt">(ixtiyoriy)</span></label>
+        <input type="time" id="xufton" />
+      </div>
+    </div>
+
+    <p class="section-label">Bomdoddan keyingi vazifalar (tartib bo'yicha)</p>
+    <div id="taskListWrap"></div>
+    <div class="add-task-row">
+      <input type="text" id="newTaskLabel" placeholder="Yangi vazifa nomi, masalan: Sport zali" />
+      <input type="number" id="newTaskDur" placeholder="daq" min="5" step="5" value="30" />
+      <button class="add-btn" id="addTaskBtn" type="button">+ Qo'shish</button>
+    </div>
+
+    <p class="section-label">Ish vaqti</p>
+    <div class="grid-inputs">
+      <div class="field">
+        <label for="ishStart">Boshlanishi</label>
+        <input type="time" id="ishStart" value="09:00" />
+      </div>
+      <div class="field">
+        <label for="ishEnd">Tugashi</label>
+        <input type="time" id="ishEnd" value="18:00" />
+      </div>
+      <div class="field" style="grid-column: span 2;">
+        <label for="ishLabel">Ish tavsifi</label>
+        <input type="text" id="ishLabel" value="Ish — syomka/montaj + rahbar topshiriqlari" />
+      </div>
+    </div>
+
+    <button class="generate-btn" id="generateBtn" type="button">Jadvalni tuzish / yangilash</button>
+    <div class="warn" id="warnBox"></div>
+  </section>
+
+  <div class="stage" id="stage">
+    <aside class="timeline" id="timeline">
+      <h3>Bugungi ip</h3>
+      <div id="beadList"></div>
+    </aside>
+    <div class="main-col">
+      <div class="hero" id="heroCard"></div>
+      <p class="upcoming-title">Keyingi bosqichlar</p>
+      <div class="upcoming-list" id="upcomingList"></div>
+    </div>
+  </div>
+
+  <footer class="note">
+    Eslatma: bildirishnomalar faqat shu sahifa brauzerda ochiq turgan vaqtda, va faqat xavfsiz (https yoki localhost) manzilda ishlaydi. Faylni to'g'ridan-to'g'ri ochsangiz (file://), brauzer bildirishnoma so'rovini avtomatik bloklaydi — bu ilovaning xatosi emas, brauzerning xavfsizlik qoidasi. Hosting qilingandan keyin (masalan GitHub Pages) to'liq ishlaydi.
+  </footer>
+</div>
+
+<script>
+(function(){
+  const REMINDERS = [
+    "Payg'ambarimiz (s.a.v.) sog'liq va bo'sh vaqtni ko'p odamlar g'aflatda qoladigan ikki ne'mat, deb aytganlar (Buxoriy rivoyati). Shu daqiqani g'animat bil.",
+    "Besh narsani besh narsadan oldin qadrla, deyilgan hadisda — jumladan bandlikdan oldin bo'sh vaqtni. Hozir shu bo'sh vaqting, undan foydalan.",
+    "Kichik amal ham ixlos bilan qilinsa, katta ajr keltiradi. Niyatingni tuzatib, boshla.",
+    "Vaqt — qaytmas boylik. Har daqiqa foydali ishga sarflansa, umr baraka topadi.",
+    "Bugungi mehnating ertangi yengillashuving uchun sabab bo'ladi. Bismillah, boshla.",
+    "G'aflatdan uyg'on — bu payt ham, avvalgi paytlar kabi, qaytmaydi. Qo'lga ol.",
+  ];
+  function randomReminder(){ return REMINDERS[Math.floor(Math.random()*REMINDERS.length)]; }
+  const $ = (id) => document.getElementById(id);
+
+  $("todayDate").textContent = new Date().toLocaleDateString("uz-UZ", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+
+  // ---------- Task list state ----------
+  let tasks = [
+    { id: 1, label: "Jismoniy shug'ullanish / trenirovka", duration: 35 },
+    { id: 2, label: "Onlayn dars", duration: 60 },
+    { id: 3, label: "Uy vazifalari", duration: 90 },
+    { id: 4, label: "Kitob o'qish — shaxsiy rivojlanish", duration: 30 },
+    { id: 5, label: "Oilaga qo'ng'iroq", duration: 10 },
+  ];
+  let nextTaskId = 6;
+
+  function renderTaskList(){
+    const wrap = $("taskListWrap");
+    wrap.innerHTML = "";
+    tasks.forEach((task, idx) => {
+      const row = document.createElement("div");
+      row.className = "task-row";
+      row.innerHTML =
+        '<span class="drag-handle">' + (idx+1) + '.</span>' +
+        '<input type="text" value="' + escapeAttr(task.label) + '" data-idx="' + idx + '" data-field="label" />' +
+        '<div><input type="number" min="5" step="5" value="' + task.duration + '" data-idx="' + idx + '" data-field="duration" /><div class="dur-lbl">daqiqa</div></div>' +
+        '<button class="icon-btn" data-action="up" data-idx="' + idx + '" title="Yuqoriga">↑</button>' +
+        '<button class="icon-btn" data-action="down" data-idx="' + idx + '" title="Pastga">↓</button>' +
+        '<button class="icon-btn danger" data-action="remove" data-idx="' + idx + '" title="O\'chirish">✕</button>';
+      wrap.appendChild(row);
+    });
+  }
+  function escapeAttr(s){ return String(s).replace(/"/g,"&quot;"); }
+
+  $("taskListWrap").addEventListener("input", (e) => {
+    const idx = e.target.getAttribute("data-idx");
+    const field = e.target.getAttribute("data-field");
+    if (idx === null || !field) return;
+    if (field === "label") tasks[idx].label = e.target.value;
+    if (field === "duration") tasks[idx].duration = Math.max(5, parseInt(e.target.value,10) || 5);
+  });
+  $("taskListWrap").addEventListener("click", (e) => {
+    const action = e.target.getAttribute("data-action");
+    if (!action) return;
+    const idx = parseInt(e.target.getAttribute("data-idx"), 10);
+    if (action === "remove") {
+      tasks.splice(idx, 1);
+    } else if (action === "up" && idx > 0) {
+      [tasks[idx-1], tasks[idx]] = [tasks[idx], tasks[idx-1]];
+    } else if (action === "down" && idx < tasks.length - 1) {
+      [tasks[idx+1], tasks[idx]] = [tasks[idx], tasks[idx+1]];
+    }
+    renderTaskList();
+  });
+  $("addTaskBtn").addEventListener("click", () => {
+    const labelInput = $("newTaskLabel");
+    const durInput = $("newTaskDur");
+    const label = labelInput.value.trim();
+    const dur = Math.max(5, parseInt(durInput.value, 10) || 30);
+    if (!label) { labelInput.focus(); return; }
+    tasks.push({ id: nextTaskId++, label, duration: dur });
+    labelInput.value = "";
+    durInput.value = "30";
+    renderTaskList();
+    labelInput.focus();
+  });
+  renderTaskList();
+
+  // ---------- Notifications ----------
+  let notifOn = false;
+  const notifBtn = $("notifBtn");
+  const notifBtnText = $("notifBtnText");
+  const notifMsg = $("notifMsg");
+  function showNotifMsg(text){
+    notifMsg.textContent = text;
+    notifMsg.classList.add("show");
+  }
+  function hideNotifMsg(){ notifMsg.classList.remove("show"); }
+
+  notifBtn.addEventListener("click", async () => {
+    hideNotifMsg();
+    if (!("Notification" in window)) {
+      showNotifMsg("Bu brauzer bildirishnoma funksiyasini qo'llab-quvvatlamaydi. Sahifadagi eslatmalar baribir ko'rinaveradi.");
+      return;
+    }
+    if (!window.isSecureContext) {
+      showNotifMsg("Bildirishnomalar faqat xavfsiz (https://) yoki localhost manzilda ishlaydi. Fayl to'g'ridan-to'g'ri (file://) ochilgan bo'lsa, brauzer ruxsat so'rovini avtomatik bloklaydi. Sahifani hosting qilgandan keyin (masalan GitHub Pages) bu tugma ishlaydi — hozircha sahifadagi eslatmalar baribir ko'rinaveradi.");
+      return;
+    }
+    if (Notification.permission === "denied") {
+      showNotifMsg("Bildirishnomalar avval bloklangan. Brauzer sozlamalaridan shu sayt uchun ruxsatni qo'lda yoqing.");
+      return;
+    }
+    if (Notification.permission === "granted") {
+      notifOn = !notifOn;
+      updateNotifBtn();
+      return;
+    }
+    try {
+      const perm = await Notification.requestPermission();
+      if (perm === "granted") { notifOn = true; updateNotifBtn(); }
+      else { showNotifMsg("Ruxsat berilmadi — xohlagan vaqtingizda qayta urinib ko'rishingiz mumkin."); }
+    } catch (e) {
+      showNotifMsg("Bildirishnoma so'rovida kutilmagan xatolik yuz berdi.");
+    }
+  });
+  function updateNotifBtn(){
+    notifBtn.classList.toggle("on", notifOn);
+    notifBtnText.textContent = notifOn ? "Bildirishnomalar yoqilgan" : "Bildirishnomalarni yoqish";
+  }
+
+  // ---------- Schedule state ----------
+  let events = [];
+  let firedIds = new Set();
+
+  function toMinutes(hhmm){ const [h,m] = hhmm.split(":").map(Number); return h*60+m; }
+  function todayAt(minutes){ const d = new Date(); d.setHours(0,0,0,0); d.setMinutes(minutes); return d; }
+  function fmt(d){ return d.toLocaleTimeString("uz-UZ", { hour:"2-digit", minute:"2-digit" }); }
+  function minutesBetween(a,b){ return Math.round((b-a)/60000); }
+
+  function buildSchedule(){
+    const bomdodStr = $("bomdod").value;
+    if (!bomdodStr){ alert("Bomdod vaqtini kiriting."); return; }
+    if (tasks.length === 0){ alert("Kamida bitta vazifa qo'shing."); return; }
+
+    let t = toMinutes(bomdodStr);
+    const blocks = [];
+    tasks.forEach((task) => {
+      const s = t, e = t + task.duration;
+      blocks.push({ startMin: s, endMin: e, label: task.label || "Vazifa", type: "task" });
+      t = e;
+    });
+    const morningEnd = t;
+
+    const ishStart = toMinutes($("ishStart").value || "09:00");
+    const ishEnd = toMinutes($("ishEnd").value || "18:00");
+    const ishLabel = $("ishLabel").value.trim() || "Ish";
+
+    const warnBox = $("warnBox");
+    if (morningEnd > ishStart) {
+      const over = morningEnd - ishStart;
+      warnBox.textContent = "Diqqat: ertalabki reja ish boshlanishidan " + over + " daqiqa keyin tugaydi. Reja siqilgan — vazifalar davomiyligini qisqartirishni ko'rib chiqing.";
+      warnBox.classList.add("show");
+    } else {
+      warnBox.classList.remove("show");
+    }
+
+    blocks.push({ startMin: ishStart, endMin: ishEnd, label: ishLabel, type: "work" });
+    blocks.push({ startMin: ishEnd, endMin: ishEnd + 5*60, label: "Ishdan keyin — shaxsiy vaqt / dam olish", type: "free" });
+
+    ["peshin","asr","shom","xufton"].forEach((id) => {
+      const v = $(id).value;
+      if (v) {
+        const m = toMinutes(v);
+        blocks.push({ startMin: m - 10, endMin: m, label: (id[0].toUpperCase()+id.slice(1)) + " namoziga tayyorgarlik", type: "prayer" });
+      }
+    });
+
+    blocks.sort((a,b) => a.startMin - b.startMin);
+    events = blocks.map((b, i) => ({ id: "ev"+i, start: todayAt(b.startMin), end: todayAt(b.endMin), label: b.label, type: b.type }));
+    firedIds = new Set();
+    $("stage").classList.add("show");
+    renderAll();
+  }
+  $("generateBtn").addEventListener("click", buildSchedule);
+
+  function currentBlockIndex(now){ for (let i=0;i<events.length;i++){ if (now >= events[i].start && now < events[i].end) return i; } return -1; }
+  function nextBlockIndex(now){ for (let i=0;i<events.length;i++){ if (events[i].start > now) return i; } return -1; }
+
+  function renderBeads(now){
+    const list = $("beadList");
+    list.innerHTML = "";
+    events.forEach((ev) => {
+      const row = document.createElement("div");
+      let state = "upcoming";
+      if (now >= ev.end) state = "done";
+      else if (now >= ev.start && now < ev.end) state = "active";
+      row.className = "bead-row " + (state==="done"?"done":state==="active"?"active":"") + (ev.type==="prayer"?" prayer":"");
+      row.innerHTML = '<div class="bead-track"><div class="bead"></div></div><div class="bead-info"><div class="bead-time">' + fmt(ev.start) + '</div><div class="bead-label">' + ev.label + '</div></div>';
+      list.appendChild(row);
+    });
+  }
+
+  const reminderCache = {};
+  function randomReminderStable(id){ if (!reminderCache[id]) reminderCache[id] = randomReminder(); return reminderCache[id]; }
+
+  function renderHero(now){
+    const hero = $("heroCard");
+    const idx = currentBlockIndex(now);
+    if (idx >= 0){
+      const ev = events[idx];
+      const remain = Math.max(0, minutesBetween(now, ev.end));
+      hero.innerHTML = '<p class="eyebrow">Hozirgi vazifa</p><h2>' + ev.label + '</h2><p class="range">' + fmt(ev.start) + ' — ' + fmt(ev.end) + '</p><div class="countdown"><span class="num">' + remain + '</span><span class="lbl">daqiqa qoldi</span></div><div class="reminder">' + randomReminderStable(ev.id) + '</div>';
+    } else {
+      const nIdx = nextBlockIndex(now);
+      if (nIdx >= 0){
+        const ev = events[nIdx];
+        const until = Math.max(0, minutesBetween(now, ev.start));
+        hero.innerHTML = '<p class="eyebrow">Hozir bo\'sh vaqt</p><h2>Keyingisi: ' + ev.label + '</h2><p class="range">' + fmt(ev.start) + ' dan boshlanadi</p><div class="countdown"><span class="num">' + until + '</span><span class="lbl">daqiqadan so\'ng</span></div><div class="reminder">' + randomReminder() + '</div>';
+      } else {
+        hero.innerHTML = '<p class="eyebrow">Kun yakunlandi</p><h2>Bugungi barcha bosqichlar tugadi</h2><div class="reminder">Ertaga yangi bomdod, yangi imkoniyat. Bugungi kichik g\'alabalaring uchun ham shukr qil.</div>';
+      }
+    }
+  }
+
+  function renderUpcoming(now){
+    const wrap = $("upcomingList");
+    wrap.innerHTML = "";
+    const rest = events.filter(ev => ev.start > now).slice(0,5);
+    if (rest.length === 0){ wrap.innerHTML = '<p class="empty-hint">Qolgan bosqich yo\'q — kun tugadi.</p>'; return; }
+    rest.forEach((ev) => {
+      const item = document.createElement("div");
+      item.className = "upcoming-item";
+      item.innerHTML = '<span class="l">' + ev.label + '</span><span class="t">' + fmt(ev.start) + '</span>';
+      wrap.appendChild(item);
+    });
+  }
+
+  function checkNotifications(now){
+    if (!notifOn) return;
+    events.forEach((ev) => {
+      const diff = Math.abs(now - ev.start);
+      if (now >= ev.start && diff < 30000 && !firedIds.has(ev.id)) {
+        firedIds.add(ev.id);
+        try { new Notification("Vaqti keldi: " + ev.label, { body: randomReminderStable(ev.id) }); } catch(e){}
+      }
+    });
+  }
+
+  function renderAll(){
+    const now = new Date();
+    renderBeads(now);
+    renderHero(now);
+    renderUpcoming(now);
+    checkNotifications(now);
+  }
+  setInterval(() => { if (events.length) renderAll(); }, 15000);
+
+  // ---------- PWA: service worker + install prompt ----------
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => { navigator.serviceWorker.register("service-worker.js").catch(() => {}); });
+  }
+  let deferredPrompt = null;
+  const installBtn = $("installBtn");
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault(); deferredPrompt = e; installBtn.style.display = "inline-flex";
+  });
+  installBtn.addEventListener("click", async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    installBtn.style.display = "none";
+  });
+  window.addEventListener("appinstalled", () => { installBtn.style.display = "none"; });
+
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  if (isIOS && !isStandalone) { $("iosHint").classList.add("show"); }
+})();
+</script>
+</body>
+</html>
